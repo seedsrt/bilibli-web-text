@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="referrer" content="no-referrer" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bilibili</title>
+  <link rel="stylesheet" href="./assets/font/iconfont.css">
+  <link rel="stylesheet" href="./assets/css/index.css">
+  <script src="./assets/js/vue.js"></script>
+  <script src="./assets/js/axios.js"></script>
+  <script>Vue.config.productionTip = false</script>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 置顶 -->
+    <div class="stick">
+      <!-- 头 -->
+      <header>
+        <span class="iconfont icon-Navbar_logo"></span>
+        <div>
+          <span class="iconfont icon-ic_search"></span>
+          <img src="./assets/images/login.png@48w_48h_1c.png" alt="" class="btn_login">
+          <img src="./assets/images/navOpenApp.png" alt="" class="btn_downloadApp">
+        </div>
+
+      </header>
+      <!-- 标题 -->
+      <nav>
+        <span :class="index === activeIndex? 'selected' :''" v-for="(item,index) in navList"
+          @click="changNav(index)">{{item.name}}</span>
+      </nav>
+    </div>
+    <!-- 主体 -->
+    <main>
+
+      <!-- 小视频部分 -->
+      <div class="video_card" v-for="item in videoList">
+        <img :src="item.pic" alt="">
+        <div class="count">
+          <div class="counter">
+            <span class="iconfont icon-icon_shipin_bofangshu"></span>
+            <span class="play">{{ item.play }}</span>
+          </div>
+          <div class="counter">
+            <span class="iconfont icon-icon_shipin_danmushu"></span>
+            <span class="play">{{ item.video_review }}</span>
+          </div>
+        </div>
+        <span class="title">{{ item.title }}</span>
+      </div>
+
+
+
+    </main>
+    <!-- 底部 -->
+    <footer>
+      <span>点击加载更多...</span>
+    </footer>
+  </div>
+</body>
+<script type="module">
+
+  const vm = new Vue({
+    el: '#app',
+    data() {
+      return {
+        activeIndex: 0,
+        navList: [],
+        videoList: []
+      }
+    },
+    /* 生命周期 在此阶段可以进行数据的修改 */
+    created() {
+      this.initNavList()
+      this.getVideoListByID(1)
+    },
+    methods: {
+      changNav(i) {
+        this.activeIndex = i
+        this.getVideoListByID()
+      },
+      initNavList() {
+        axios({
+          methods: 'GET',
+          url: 'https://www.escook.cn/channels',
+        }).then((result) => {
+          this.navList = result.data 
+          console.log(this.navList);
+        })
+       
+      },
+      getVideoListByID(vid) {
+        const id = vid || this.navList[this.activeIndex].id
+        axios({
+          methods: 'GET',
+          url: 'https://www.escook.cn/videos',
+          params: {
+            channel_id: id
+          }
+        }).then((result) => {
+          this.videoList = result.data
+          console.log(this.videoList);
+        })
+      }
+    }
+  })
+</script>
+
+
+</html>
